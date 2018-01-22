@@ -1,0 +1,79 @@
+1.使用 gradle extra properties管理dependencies的版本号
+   /**
+    * 第一种
+    */
+    //1.第一步
+    在工程目录下新建一个gradle文件config.gradle，并用ext{...}方法里设置一个数组变量
+    //2.第二步
+    在工程目录下的build.gradle文件的首行，添加一行apply from : "config.gradle"
+    //3.第三步
+    在module目录下的build.gradle文件中，将对应的依赖版本替换成rootProject.ext.变量名.键值
+
+        //compileSdkVersion 25
+        //buildToolsVersion "27.0.3"
+        compileSdkVersion rootProject.ext.ess.compileSdkVersion
+        buildToolsVersion rootProject.ext.ess.buildToolsVersion
+
+    /**
+    * 第二种
+    */
+    //1.第一步
+    在工程目录下的文件gradle.properties中的末行添加依赖的版本号
+    //2.第二布
+    在module里面的build.gradle中通过project.property("键值").toString()来将获得值转化为字符串或者project.property("键值").toInteger()来将获得值转化为整形
+
+        //compileSdkVersion 25
+        //buildToolsVersion "27.0.3"
+        compileSdkVersion project.property("compileSdkVersion").toInteger()
+        buildToolsVersion project.property("buildToolsVersion").toString()
+   /**
+   * 第三种
+   */
+   //第一步
+   在工程目录的build.gradle文件中写如下：
+        buildscript {
+            ...
+        }
+
+        allprojects {
+            ...
+        }
+        ...
+
+        //添加内容
+        ext {
+            // sdk and tools
+            minSdkVersion = 14
+            targetSdkVersion = 23
+            compileSdkVersion = 23
+            buildToolsVersion = '23.0.2'
+
+            // dependencies versions
+            supportLibraryVersion = '23.4.0'
+            playServicesVersion = '9.2.1'
+        }
+   //第二步
+   在module级别的build.gradle文件中如下引用：
+
+   apply plugin: 'com.android.application'
+   android {
+       ...
+   }
+   ...
+
+   dependencies {
+       // support libraries(注意之前依赖里的单引号在此处变成双引号)
+       compile "com.android.support:appcompat-v7:$rootProject.supportLibraryVersion"
+       compile "com.android.support:design:$rootProject.supportLibraryVersion"
+       compile "com.android.support:percent:$rootProject.supportLibraryVersion"
+       compile "com.android.support:cardview-v7:$rootProject.supportLibraryVersion"
+       compile "com.android.support:gridlayout-v7:$rootProject.supportLibraryVersion"
+
+       //play services
+       compile "com.google.android.gms:play-services-location:$rootProject.playServicesVersion"
+       compile "com.google.android.gms:play-services-gcm:$rootProject.playServicesVersion"
+
+       // other dependencies
+       ...
+   }
+2.
